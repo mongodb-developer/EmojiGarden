@@ -24,8 +24,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val model : EmojiVm = viewModel()
-
             val emojiList : List<String> by model.emojiData.observeAsState(emptyList())
+
             MainActivityUi(emojiList)
         }
     }

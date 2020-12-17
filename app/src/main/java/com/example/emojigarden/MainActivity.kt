@@ -7,19 +7,26 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.viewinterop.viewModel
 import com.example.emojigarden.ui.EmojiGardenTheme
 
 @ExperimentalLayout
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainActivityUi(emptyList())
+            val model : EmojiVm = viewModel()
+
+            val emojiList : List<String> by model.emojiData.observeAsState(emptyList())
+            MainActivityUi(emojiList)
         }
     }
 }

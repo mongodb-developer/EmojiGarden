@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.emoji.text.EmojiCompat
 import com.example.emojigarden.ui.EmojiGardenTheme
 
 @ExperimentalLayout
@@ -27,10 +26,15 @@ class MainActivity : AppCompatActivity() {
 
 @ExperimentalLayout
 @Composable
-fun MainActivityUi(emojiList : List<String>) {
+fun MainActivityUi(emojiList: List<String>) {
     EmojiGardenTheme {
         Surface(color = MaterialTheme.colors.background) {
-            EmojiGrid(emojiList)
+            Box(
+                Modifier.fillMaxWidth().fillMaxHeight().padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                EmojiGrid(emojiList)
+            }
         }
     }
 }
@@ -38,11 +42,10 @@ fun MainActivityUi(emojiList : List<String>) {
 @ExperimentalLayout
 @Composable
 fun EmojiGrid(emojiList: List<String>) {
-
-    Box(Modifier.fillMaxWidth().fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
-            FlowRow {
-                emojiList.forEach { EmojiHolder(emoji = it) }
-            }
+    FlowRow {
+        emojiList.forEach {
+            EmojiHolder(it)
+        }
     }
 }
 
@@ -55,5 +58,6 @@ fun EmojiHolder(emoji: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    MainActivityUi(List(160) { "😋" })
+    val emojiList = MutableList(400) { "😋" }
+    MainActivityUi(emojiList)
 }

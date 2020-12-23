@@ -1,13 +1,37 @@
 package com.example.emojigarden
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.*
+import io.realm.*
+import io.realm.kotlin.toFlow
+import kotlinx.coroutines.flow.Flow
+import androidx.compose.runtime.getValue
 
-class EmojiVm : ViewModel() {
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
-    private val _emojiData : MutableLiveData<List<String>> = MutableLiveData(List(400) { "🥰" })
 
-    val emojiData = _emojiData
+class EmojiVm(application: Application) : AndroidViewModel(application) {
 
+    private val TAG = this.javaClass.simpleName
+
+    var emojiState : List<EmojiTile> by mutableStateOf(listOf())
+        private set
+
+     private val _emojiTiles : Flow<RealmResults<EmojiTile>> =  (application as EmojiGardenApplication).realmModule
+         .getSyncedRealm()
+         .where(EmojiTile::class.java)
+         .findAllAsync()
+         .toFlow()
+
+    init {
+        viewModelScope.launch {
+            _emojiTiles.collect {
+                emojiState = it
+            }
+        }
+    }
 
 }

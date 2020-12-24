@@ -15,8 +15,6 @@ import kotlinx.coroutines.launch
 
 class EmojiVm(application: Application) : AndroidViewModel(application) {
 
-    private val TAG = this.javaClass.simpleName
-
     var emojiState : List<EmojiTile> by mutableStateOf(listOf())
         private set
 

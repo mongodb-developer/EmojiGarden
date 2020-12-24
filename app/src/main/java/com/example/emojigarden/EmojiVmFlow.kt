@@ -13,16 +13,16 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
-class EmojiVm(application: Application) : AndroidViewModel(application) {
+class EmojiVmFlow(application: Application) : AndroidViewModel(application) {
 
     var emojiState : List<EmojiTile> by mutableStateOf(listOf())
         private set
 
-     private val _emojiTiles : Flow<RealmResults<EmojiTile>> =  (application as EmojiGardenApplication).realmModule
-         .getSyncedRealm()
-         .where(EmojiTile::class.java)
-         .findAllAsync()
-         .toFlow()
+    private val _emojiTiles : Flow<RealmResults<EmojiTile>> =  (application as EmojiGardenApplication).realmModule
+        .getSyncedRealm()
+        .where(EmojiTile::class.java)
+        .findAllAsync()
+        .toFlow()
 
     init {
         viewModelScope.launch {

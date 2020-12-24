@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val model : EmojiVm = viewModel()
+            val model : EmojiVmRealm = viewModel()
             MainActivityUi(model.emojiState)
         }
     }

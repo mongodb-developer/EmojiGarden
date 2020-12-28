@@ -31,6 +31,7 @@ class EmojiVmRealm(application: Application) : AndroidViewModel(application) {
     private val emojiTilesResults : RealmResults<EmojiTile> =  (application as EmojiGardenApplication).realmModule
          .getSyncedRealm()
          .where(EmojiTile::class.java)
+         .sort(EmojiTile::index.name)
          .findAllAsync()
          .apply {
              addChangeListener(emojiTilesChangeListener)

@@ -14,29 +14,31 @@ import java.lang.IllegalStateException
 /**
  * Manages the setup for a synced realm db.
  * Limitations: This currently requires the user to be online the first time they use the app.
+ *
+ * Steps that this class carries out when instantiated:
+ * 1. A local realm is initialized.
+ * 2. It assumes you're online, and tries to login with an anonymous user.
+ * 3. If successful, it uses that logged-in user to open a synced realm.
+ * 4. The Synced realm is made available via the getSyncedRealm function.
+ *
+ * All That's needed
  */
-class RealmModule(application: Application) {
+class RealmModule(application: Application, appId : String) {
     private var syncedRealm: Realm? = null
-    private lateinit var app : App
+    private val app : App
     private val TAG = RealmModule::class.java.simpleName
-
-    // Get this from https://realm.mongodb.com/ for the database you created under there.
-    private val appId = "emojigarden-cmwby"
-
-    // Setup the thing you'd always need to do.
-    private fun setupLocalRealm(applicationContext: Application) {
-        Realm.init(applicationContext) // Same for local and remote
-        app = App(AppConfiguration.Builder(appId).build())
-    }
 
     init {
         Log.d(TAG, "Setting up realm")
-        setupLocalRealm(application)
+
+        Realm.init(application) // Required for local or remote.
+        app = App(AppConfiguration.Builder(appId).build())
+
+        // Login anonymously because a logged in user is required to open a synced realm.
         loginAnonSyncedRealm(
             onSuccess = {Log.d(TAG, "Login successful") },
             onFailure = {Log.d(TAG, "Login Unsuccessful, are you connected to the net?")}
         )
-
     }
 
     fun loginAnonSyncedRealm(organization : String = "default", onSuccess : () -> Unit, onFailure : () -> Unit ) {
@@ -63,6 +65,16 @@ class RealmModule(application: Application) {
 
     private fun instantiateSyncedRealm(user: User?, partition : String) {
         val config: SyncConfiguration = SyncConfiguration.defaultConfig(user, partition)
-        syncedRealm = Realm.getInstance(config)
+        Realm.getInstanceAsync(config, object : Realm.Callback() {
+            override fun onSuccess(realm: Realm) {
+                syncedRealm = realm
+                Log.d(TAG, "Opened a synced realm successfully")
+            }
+
+            override fun onError(exception: Throwable) {
+                Log.e(TAG, "There was an error opening a synced realm ${exception.message}")
+                super.onError(exception)
+            }
+        })
     }
 }

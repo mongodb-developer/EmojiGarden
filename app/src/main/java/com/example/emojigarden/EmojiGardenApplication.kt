@@ -7,6 +7,9 @@ class EmojiGardenApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        realmModule = RealmModule(this)
+
+        // Get your appId from https://realm.mongodb.com/ for the database you created under there.
+        val appId = "emojigarden-cmwby"
+        realmModule = RealmModule(this, appId)
     }
 }

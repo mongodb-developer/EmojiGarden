@@ -33,22 +33,9 @@ class RealmModule(application: Application) {
         Log.d(TAG, "Setting up realm")
         setupLocalRealm(application)
         loginAnonSyncedRealm(
-            onSuccess = {Log.d(TAG, "Login successful")
-//                        insertRandomData()
-                        },
+            onSuccess = {Log.d(TAG, "Login successful") },
             onFailure = {Log.d(TAG, "Login Unsuccessful, are you connected to the net?")}
         )
-
-    }
-
-    fun insertRandomData() {
-        syncedRealm?.executeTransactionAsync {
-            val q : List<EmojiTile> = List(103){ i ->  EmojiTile().apply {
-                index = i
-                emoji = "🥰"
-            } }
-            it.insert(q)
-        }
 
     }
 

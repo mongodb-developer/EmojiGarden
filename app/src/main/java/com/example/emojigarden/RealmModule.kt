@@ -41,7 +41,7 @@ class RealmModule(application: Application, appId : String) {
         )
     }
 
-    fun loginAnonSyncedRealm(organization : String = "default", onSuccess : () -> Unit, onFailure : () -> Unit ) {
+    private fun loginAnonSyncedRealm(organization : String = "default", onSuccess : () -> Unit, onFailure : () -> Unit ) {
 
         check(!Boolean.equals(app.currentUser()?.isLoggedIn)) {
             "Attempted to login again after login was already successful"

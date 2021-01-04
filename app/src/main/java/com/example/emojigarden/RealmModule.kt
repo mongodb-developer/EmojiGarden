@@ -65,16 +65,6 @@ class RealmModule(application: Application, appId : String) {
 
     private fun instantiateSyncedRealm(user: User?, partition : String) {
         val config: SyncConfiguration = SyncConfiguration.defaultConfig(user, partition)
-        Realm.getInstanceAsync(config, object : Realm.Callback() {
-            override fun onSuccess(realm: Realm) {
-                syncedRealm = realm
-                Log.d(TAG, "Opened a synced realm successfully")
-            }
-
-            override fun onError(exception: Throwable) {
-                Log.e(TAG, "There was an error opening a synced realm ${exception.message}")
-                super.onError(exception)
-            }
-        })
+        syncedRealm = Realm.getInstance(config)
     }
 }

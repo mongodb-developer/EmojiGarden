@@ -28,7 +28,7 @@ class EmojiVmRealm(application: Application) : AndroidViewModel(application) {
         emojiState = updatedResults
     }
 
-    private val emojiTilesResults : RealmResults<EmojiTile> =  (application as EmojiGardenApplication).realmModule
+    private val emojiTilesResults : RealmResults<EmojiTile> =  getApplication<EmojiGardenApplication>().realmModule
          .getSyncedRealm()
          .where(EmojiTile::class.java)
          .sort(EmojiTile::index.name)

@@ -18,7 +18,7 @@ class EmojiVmFlow(application: Application) : AndroidViewModel(application) {
     var emojiState : List<EmojiTile> by mutableStateOf(listOf())
         private set
 
-    private val _emojiTiles : Flow<RealmResults<EmojiTile>> =  (application as EmojiGardenApplication).realmModule
+    private val _emojiTiles : Flow<RealmResults<EmojiTile>> =  getApplication<EmojiGardenApplication>().realmModule
         .getSyncedRealm()
         .where(EmojiTile::class.java)
         .findAllAsync()

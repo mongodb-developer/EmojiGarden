@@ -41,11 +41,7 @@ class RealmModule(application: Application, appId : String) {
         )
     }
 
-    private fun loginAnonSyncedRealm(organization : String = "default", onSuccess : () -> Unit, onFailure : () -> Unit ) {
-
-        check(!Boolean.equals(app.currentUser()?.isLoggedIn)) {
-            "Attempted to login again after login was already successful"
-        }
+    fun loginAnonSyncedRealm(organization : String = "default", onSuccess : () -> Unit, onFailure : () -> Unit ) {
 
         val credentials = Credentials.anonymous()
 
@@ -60,6 +56,22 @@ class RealmModule(application: Application, appId : String) {
         }
 
     }
+
+    /**
+     * This is mainly helpful to convey the schema and rules of the EmojiTile, to the Realm Sync Server by writing an instance of the object.
+     */
+    fun initializeCollectionIfEmpty() {
+        syncedRealm?.executeTransactionAsync { realm ->
+            if (realm.where(EmojiTile::class.java).count() == 0L) {
+                realm.insert(EmojiTile().apply {
+                    emoji = "🌳"
+                    organization = "default"
+                })
+            }
+        }
+    }
+
+    fun isInitialized() = syncedRealm != null
 
     fun getSyncedRealm() : Realm = syncedRealm ?: throw IllegalStateException("loginAnonSyncedRealm has to return onSuccess first")
 

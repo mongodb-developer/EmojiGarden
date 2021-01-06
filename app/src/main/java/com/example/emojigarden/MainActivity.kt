@@ -2,7 +2,10 @@ package com.example.emojigarden
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -15,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
 import com.example.emojigarden.ui.EmojiGardenTheme
 
+@ExperimentalFoundationApi
 @ExperimentalLayout
 class MainActivity : AppCompatActivity() {
 
@@ -27,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+@ExperimentalFoundationApi
 @ExperimentalLayout
 @Composable
 fun MainActivityUi(emojiList: List<EmojiTile>) {
@@ -42,12 +47,14 @@ fun MainActivityUi(emojiList: List<EmojiTile>) {
     }
 }
 
+@ExperimentalFoundationApi
 @ExperimentalLayout
 @Composable
 fun EmojiGrid(emojiList: List<EmojiTile>) {
-    FlowRow {
-        emojiList.forEach {
-            EmojiHolder(it)
+
+    LazyVerticalGrid(cells = GridCells.Adaptive(20.dp)) {
+        items(emojiList) { emojiTile ->
+            EmojiHolder(emojiTile)
         }
     }
 }
@@ -57,6 +64,7 @@ fun EmojiHolder(emoji: EmojiTile) {
     Text(emoji.emoji)
 }
 
+@ExperimentalFoundationApi
 @ExperimentalLayout
 @Preview(showBackground = true)
 @Composable

@@ -6,10 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,9 +30,7 @@ class MainActivity : AppCompatActivity() {
                 MainActivityUi(model.emojiState)
             } else
             {
-                LoginAndDataInitView(
-                    loginAndDataInitVm::login,
-                    loginAndDataInitVm::initializeData,
+                LoginAndDataInitView(loginAndDataInitVm::login, loginAndDataInitVm::initializeData,
                     loginAndDataInitVm.allowDataInitialization)
             }
         }
@@ -47,13 +42,11 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MainActivityUi(emojiList: List<EmojiTile>) {
     EmojiGardenTheme {
-        Surface(color = MaterialTheme.colors.background) {
-            Box(
-                Modifier.fillMaxWidth().fillMaxHeight().padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                EmojiGrid(emojiList)
-            }
+        Box(
+            Modifier.fillMaxWidth().fillMaxHeight().padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            EmojiGrid(emojiList)
         }
     }
 }

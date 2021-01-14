@@ -71,6 +71,10 @@ class RealmModule(application: Application, appId : String) {
         }
     }
 
+    /**
+     * Checks if the realm is initialized.
+     * Generally, syncedRealm should only be exposed as a non-null type.
+     */
     fun isInitialized() = syncedRealm != null
 
     fun getSyncedRealm() : Realm = syncedRealm ?: throw IllegalStateException("loginAnonSyncedRealm has to return onSuccess first")

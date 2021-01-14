@@ -88,6 +88,12 @@ fun LoginAndDataInitView(login : () -> Unit,
     }
 }
 
+@Composable
+@Preview(showBackground = true)
+fun InitializationPreview() {
+    LoginAndDataInitView({},{},false)
+}
+
 @ExperimentalFoundationApi
 @ExperimentalLayout
 @Preview(showBackground = true)
@@ -96,8 +102,3 @@ fun DefaultPreview() {
     MainActivityUi(List(102){EmojiTile().apply  { emoji = "😋" }})
 }
 
-@Composable
-@Preview(showBackground = true)
-fun InitializationPreview() {
-    LoginAndDataInitView({},{},false)
-}

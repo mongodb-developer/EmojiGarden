@@ -10,9 +10,9 @@ import androidx.compose.runtime.setValue
 /**
  * Methods to:
  * 1. Login anonymously with MongoDb Realm Sync
- * 2. Send initial data to MongoDb Realm Sync
+ * 2. Send initial data to MongoDB Realm Sync
  *
- * A bit of state to ensure inital data isn't attempted to be sent unless you're logged in.
+ * A bit of state to ensure initial data isn't attempted to be sent unless you're logged in.
  */
 class LoginAndDataInitVm(application: Application) : AndroidViewModel(application) {
     private val TAG = LoginAndDataInitVm::class.java.simpleName

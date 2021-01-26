@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 fun MainActivityUi(emojiList: List<EmojiTile>) {
     EmojiGardenTheme {
         Box(
-            Modifier.fillMaxWidth().fillMaxHeight().padding(16.dp),
+            Modifier.fillMaxSize().padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
             EmojiGrid(emojiList)

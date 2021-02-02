@@ -83,7 +83,7 @@ fun LoginAndDataInitView(login : () -> Unit,
         Spacer(Modifier.preferredSize(16.dp))
 
         Button(initializeData, enabled = allowDataInitialization){
-            Text("Create Initial Data")
+            Text("Add 🌳")
         }
     }
 }

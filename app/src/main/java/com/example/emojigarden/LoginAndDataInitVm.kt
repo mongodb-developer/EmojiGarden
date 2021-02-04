@@ -17,19 +17,16 @@ import androidx.compose.runtime.setValue
 class LoginAndDataInitVm(application: Application) : AndroidViewModel(application) {
     private val TAG = LoginAndDataInitVm::class.java.simpleName
 
-    var allowDataInitialization : Boolean by mutableStateOf(false)
-        private set
-
     var showGarden : Boolean by mutableStateOf(getApplication<EmojiGardenApplication>().realmModule.isInitialized())
         private set
 
     fun login() =
         getApplication<EmojiGardenApplication>().realmModule.loginAnonSyncedRealm(
-            onSuccess = { allowDataInitialization = true }, // If login succeeds, allow data init
+            onSuccess = ::initializeData, // If login succeeds, initialize data within the app
             onFailure = { Log.d(TAG, "Failed to login") } // Just log failures
         )
 
-    fun initializeData() {
+    private fun initializeData() {
         getApplication<EmojiGardenApplication>().realmModule.initializeCollectionIfEmpty()
         showGarden = true
     }

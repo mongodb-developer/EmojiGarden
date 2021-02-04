@@ -30,8 +30,7 @@ class MainActivity : AppCompatActivity() {
                 MainActivityUi(model.emojiState)
             } else
             {
-                LoginAndDataInitView(loginAndDataInitVm::login, loginAndDataInitVm::initializeData,
-                    loginAndDataInitVm.allowDataInitialization)
+                LoginAndDataInitView(loginAndDataInitVm::login)
             }
         }
     }
@@ -69,9 +68,7 @@ fun EmojiHolder(emoji: EmojiTile) {
 }
 
 @Composable
-fun LoginAndDataInitView(login : () -> Unit,
-                         initializeData : () -> Unit,
-                         allowDataInitialization : Boolean) {
+fun LoginAndDataInitView(login : () -> Unit) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally){
@@ -79,19 +76,13 @@ fun LoginAndDataInitView(login : () -> Unit,
         Button(login){
             Text("Login")
         }
-
-        Spacer(Modifier.preferredSize(16.dp))
-
-        Button(initializeData, enabled = allowDataInitialization){
-            Text("Add 🌳")
-        }
     }
 }
 
 @Composable
 @Preview(showBackground = true)
 fun InitializationPreview() {
-    LoginAndDataInitView({},{},false)
+    LoginAndDataInitView{}
 }
 
 @ExperimentalFoundationApi

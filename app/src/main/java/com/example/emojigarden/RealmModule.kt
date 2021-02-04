@@ -41,20 +41,25 @@ class RealmModule(application: Application, appId : String) {
         )
     }
 
-    fun loginAnonSyncedRealm(organization : String = "default", onSuccess : () -> Unit, onFailure : () -> Unit ) {
+    fun loginAnonSyncedRealm(partitionKey : String = "default", onSuccess : () -> Unit, onFailure : () -> Unit ) {
 
         val credentials = Credentials.anonymous()
 
         app.loginAsync(credentials) { loginResult ->
             Log.d("RealmModule", "logged in: $loginResult, error? : ${loginResult.error}")
             if (loginResult.isSuccess) {
-                instantiateSyncedRealm(loginResult.get(), organization)
+                instantiateSyncedRealm(loginResult.get(), partitionKey)
                 onSuccess()
             } else {
                 onFailure()
             }
         }
 
+    }
+
+    private fun instantiateSyncedRealm(user: User?, partition : String) {
+        val config: SyncConfiguration = SyncConfiguration.defaultConfig(user, partition)
+        syncedRealm = Realm.getInstance(config)
     }
 
     /**
@@ -65,7 +70,6 @@ class RealmModule(application: Application, appId : String) {
             if (realm.where(EmojiTile::class.java).count() == 0L) {
                 realm.insert(EmojiTile().apply {
                     emoji = "🟫"
-                    event = "default"
                 })
             }
         }
@@ -79,8 +83,4 @@ class RealmModule(application: Application, appId : String) {
 
     fun getSyncedRealm() : Realm = syncedRealm ?: throw IllegalStateException("loginAnonSyncedRealm has to return onSuccess first")
 
-    private fun instantiateSyncedRealm(user: User?, partition : String) {
-        val config: SyncConfiguration = SyncConfiguration.defaultConfig(user, partition)
-        syncedRealm = Realm.getInstance(config)
-    }
 }

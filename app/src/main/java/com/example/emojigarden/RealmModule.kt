@@ -64,8 +64,8 @@ class RealmModule(application: Application, appId : String) {
         syncedRealm?.executeTransactionAsync { realm ->
             if (realm.where(EmojiTile::class.java).count() == 0L) {
                 realm.insert(EmojiTile().apply {
-                    emoji = "🌳"
-                    organization = "default"
+                    emoji = "🟫"
+                    event = "default"
                 })
             }
         }

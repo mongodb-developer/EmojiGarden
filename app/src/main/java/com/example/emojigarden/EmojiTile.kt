@@ -13,5 +13,5 @@ class EmojiTile : RealmModel {
     var _id : ObjectId = ObjectId.get()
     var index = 0
     var emoji : String = ""
-    var organization : String = "default" // This will be the partition key (separates synced realms so different organizations can have different gardens)
+    var event : String = "default" // This will be the partition key (separates synced realms so different organizations can have different gardens)
 }

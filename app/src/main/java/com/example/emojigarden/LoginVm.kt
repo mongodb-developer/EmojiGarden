@@ -14,8 +14,8 @@ import androidx.compose.runtime.setValue
  *
  * A bit of state to ensure initial data isn't attempted to be sent unless you're logged in.
  */
-class LoginAndDataInitVm(application: Application) : AndroidViewModel(application) {
-    private val TAG = LoginAndDataInitVm::class.java.simpleName
+class LoginVm(application: Application) : AndroidViewModel(application) {
+    private val TAG = LoginVm::class.java.simpleName
 
     var showGarden : Boolean by mutableStateOf(getApplication<EmojiGardenApplication>().realmModule.isInitialized())
         private set

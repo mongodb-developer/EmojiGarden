@@ -23,29 +23,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val loginAndDataInitVm : LoginAndDataInitVm = viewModel()
+            val loginVm : LoginVm = viewModel()
 
-            if(loginAndDataInitVm.showGarden){
+            if(loginVm.showGarden){
                 val model : EmojiVmRealm = viewModel()
                 MainActivityUi(model.emojiState)
             } else
             {
-                LoginAndDataInitView(loginAndDataInitVm::login)
+                LoginView(loginVm::login)
             }
-        }
-    }
-}
 
-@ExperimentalFoundationApi
-@ExperimentalLayout
-@Composable
-fun MainActivityUi(emojiList: List<EmojiTile>) {
-    EmojiGardenTheme {
-        Box(
-            Modifier.fillMaxSize().padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            EmojiGrid(emojiList)
         }
     }
 }
@@ -67,9 +54,28 @@ fun EmojiHolder(emoji: EmojiTile) {
     Text(emoji.emoji)
 }
 
+@Preview
 @Composable
-fun LoginAndDataInitView(login : () -> Unit) {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp),
+fun EmojiPreview() {
+    EmojiHolder(EmojiTile().apply { emoji = "😼" })
+}
+
+@ExperimentalFoundationApi
+@ExperimentalLayout
+@Composable
+fun MainActivityUi(emojiList: List<EmojiTile>) {
+    EmojiGardenTheme {
+        Box(
+            Modifier.fillMaxSize().padding(16.dp)
+        ) {
+            EmojiGrid(emojiList)
+        }
+    }
+}
+
+@Composable
+fun LoginView(login : () -> Unit) {
+    Column(modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally){
 
@@ -81,8 +87,8 @@ fun LoginAndDataInitView(login : () -> Unit) {
 
 @Composable
 @Preview(showBackground = true)
-fun InitializationPreview() {
-    LoginAndDataInitView{}
+fun LoginPreview() {
+    LoginView{}
 }
 
 @ExperimentalFoundationApi
@@ -90,6 +96,6 @@ fun InitializationPreview() {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    MainActivityUi(List(102){EmojiTile().apply  { emoji = "😋" }})
+    val emojis = listOf("🐤","🐦","🐔","🦤","🕊","️","🦆","🦅","🪶","🦩","🐥","-","🐣","🦉","🦜","🦚","🐧","🐓","🦢","🦃","🦡","🦇","🐻","🦫","🦬","🐈","‍","⬛","🐗","🐪","🐈","🐱","🐿","️","🐄","🐮","🦌","🐕","🐶","🐘","🐑","🦊","🦒","🐐","🦍","🦮","🐹","🦔","🦛","🐎","🐴","🦘","🐨","🐆","🦁","🦙","🦣","🐒","🐵","🐁","🐭","🦧","🦦","🐂","🐼","🐾","🐖","🐷","🐽","🐻","‍","❄","️","🐩","🐇","🐰","🦝","🐏","🐀","🦏","🐕","‍","🦺","🦨","🦥","🐅","🐯","🐫","-","🦄","🐃","🐺","🦓","🐳","🐡","🐬","🐟","🐙","🦭","🦈","🐚","🐳","🐠","🐋","🌱","🌵","🌳","🌲","🍂","🍀","🌿","🍃","🍁","🌴","🪴","🌱","☘","️","🌾","🐊","🐊","🐉","🐲","🦎","🦕","🐍","🦖","-","🐢")
+    MainActivityUi(List(102){ i -> EmojiTile().apply  { emoji = emojis[i] }})
 }
-

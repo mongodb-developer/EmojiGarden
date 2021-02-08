@@ -75,7 +75,7 @@ fun MainActivityUi(emojiList: List<EmojiTile>) {
 
 @Composable
 fun LoginView(login : () -> Unit) {
-    Column(modifier = Modifier.padding(16.dp),
+    Column(modifier = Modifier.fillMaxWidth().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally){
 

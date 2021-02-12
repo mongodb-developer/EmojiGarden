@@ -21,6 +21,7 @@ class EmojiVmFlow(application: Application) : AndroidViewModel(application) {
     private val _emojiTiles : Flow<RealmResults<EmojiTile>> =  getApplication<EmojiGardenApplication>().realmModule
         .getSyncedRealm()
         .where(EmojiTile::class.java)
+        .sort(EmojiTile::index.name)
         .findAllAsync()
         .toFlow()
 

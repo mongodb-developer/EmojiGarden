@@ -25,6 +25,7 @@ import java.lang.IllegalStateException
  */
 class RealmModule(application: Application, appId : String) {
     private var syncedRealm: Realm? = null
+    private var insertRealm : Realm? = null
     private val app : App
     private val TAG = RealmModule::class.java.simpleName
 
@@ -49,12 +50,18 @@ class RealmModule(application: Application, appId : String) {
             Log.d("RealmModule", "logged in: $loginResult, error? : ${loginResult.error}")
             if (loginResult.isSuccess) {
                 instantiateSyncedRealm(loginResult.get(), partitionKey)
+                instantiateInsertRealm(loginResult.get(), loginResult.get().id)
                 onSuccess()
             } else {
                 onFailure()
             }
         }
 
+    }
+
+    private fun instantiateInsertRealm(user: User?, partition : String) {
+        val config: SyncConfiguration = SyncConfiguration.defaultConfig(user, partition)
+        insertRealm = Realm.getInstance(config)
     }
 
     private fun instantiateSyncedRealm(user: User?, partition : String) {
@@ -83,4 +90,5 @@ class RealmModule(application: Application, appId : String) {
 
     fun getSyncedRealm() : Realm = syncedRealm ?: throw IllegalStateException("loginAnonSyncedRealm has to return onSuccess first")
 
+    fun getInsertRealm() : Realm = insertRealm ?: throw IllegalStateException("loginAnonSyncedRealm has to return onSuccess first")
 }

@@ -1,23 +1,23 @@
 package com.example.emojigarden
 
+
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
 import com.example.emojigarden.ui.EmojiGardenTheme
+import androidx.activity.compose.setContent
+import androidx.lifecycle.viewmodel.compose.viewModel
+
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
 }
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 @Composable
 fun EmojiGrid(emojiList: List<EmojiTile>) {
 
@@ -61,7 +60,6 @@ fun EmojiPreview() {
 }
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 @Composable
 fun MainActivityUi(emojiList: List<EmojiTile>) {
     EmojiGardenTheme {
@@ -92,7 +90,6 @@ fun LoginPreview() {
 }
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {

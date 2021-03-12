@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import io.realm.RealmQuery
 import io.realm.kotlin.syncSession
 
 class EmojiSelectorVm(application: Application) : AndroidViewModel(application) {
@@ -25,12 +26,16 @@ class EmojiSelectorVm(application: Application) : AndroidViewModel(application) 
         getApplication<EmojiGardenApplication>().realmModule.getInsertRealm()
             .executeTransactionAsync { realm ->
 
-                realm.insertOrUpdate(TileClaim().apply {
+                var existingClaim = realm.where(TileClaim::class.java).findFirst()
+                if(existingClaim == null) {
+                    existingClaim = TileClaim()
+                }
+
+                realm.insertOrUpdate(existingClaim.apply {
                     tileId = currentEmoji!!._id
                     event = realm.syncSession.user.id
                     emoji = newEmoji
                 })
-                currentEmoji = null
             }
     }
 
@@ -38,12 +43,8 @@ class EmojiSelectorVm(application: Application) : AndroidViewModel(application) 
         getApplication<EmojiGardenApplication>().realmModule.getInsertRealm()
             .executeTransactionAsync { realm ->
                 realm.insertOrUpdate(TileClaim().apply {
-                refTile = currentEmoji!!.apply {
-                    event = realm.syncSession.user.id
                     name = updatedName
                     bio = updatedDescription
-                    owner = realm.syncSession.user.id
-                }
                     event = realm.syncSession.user.id
                 })
             }

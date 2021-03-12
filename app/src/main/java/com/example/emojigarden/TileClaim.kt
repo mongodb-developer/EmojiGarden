@@ -15,4 +15,5 @@ open class TileClaim : RealmModel {
     var name = ""
     var bio = ""
     var tileId : ObjectId = ObjectId.get()
+    var rejected : Boolean = false
 }

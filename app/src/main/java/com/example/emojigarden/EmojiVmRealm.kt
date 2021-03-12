@@ -7,6 +7,7 @@ import io.realm.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.setValue
+import io.realm.kotlin.syncSession
 
 
 class EmojiVmRealm(application: Application) : AndroidViewModel(application) {
@@ -26,6 +27,8 @@ class EmojiVmRealm(application: Application) : AndroidViewModel(application) {
         OrderedRealmCollectionChangeListener<RealmResults<EmojiTile>> { updatedResults, _ ->
         emojiState = updatedResults.freeze()
     }
+
+    val myToken : String by mutableStateOf<String>(getApplication<EmojiGardenApplication>().realmModule.getSyncedRealm().syncSession.user.id)
 
     private val emojiTilesResults : RealmResults<EmojiTile> =  getApplication<EmojiGardenApplication>().realmModule
          .getSyncedRealm()

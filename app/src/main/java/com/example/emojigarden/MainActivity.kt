@@ -2,110 +2,119 @@ package com.example.emojigarden
 
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.setContent
+
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
 import com.example.emojigarden.ui.EmojiGardenTheme
 import androidx.compose.runtime.getValue
 
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
+@ExperimentalMaterialApi
 class MainActivity : AppCompatActivity() {
 
     @ExperimentalMaterialApi
+    @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
+            setContent {
 
-            // See why login has stopped working
-            // Sort out how to wrap up the opening and closing without crashing it lol
+                // See why login has stopped working
+                // Sort out how to wrap up the opening and closing without crashing it lol
 
-            val states = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
-            val emojiSelectorVm: EmojiSelectorVm = viewModel()
+                val states = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+                val bottomSheetScope = rememberCoroutineScope()
 
-            ModalBottomSheetLayout(
-                sheetContent = {
-                    OptionalOptions({ newEmoji ->
-                        emojiSelectorVm.onNewEmojiSelected(newEmoji)
-                        states.hide()
-                    }, emojiSelectorVm.currentEmoji,
-                        {a,b -> emojiSelectorVm.onBioUpdated(a,b)
-                            states.hide()}
-                    )
-                },
-                sheetState = states
-            ) {
+                val emojiSelectorVm: EmojiSelectorVm = viewModel()
 
-                val loginVm: LoginVm = viewModel()
+                ModalBottomSheetLayout(
+                    sheetContent = {
+                        OptionalOptions({ newEmoji ->
+                            emojiSelectorVm.onNewEmojiSelected(newEmoji)
+                            bottomSheetScope.launch { states.hide() }
+                        }, emojiSelectorVm.currentEmoji,
+                            {a,b -> emojiSelectorVm.onBioUpdated(a,b)
+                                bottomSheetScope.launch { states.hide() } }
+                        )
+                    },
+                    sheetState = states
+                ) {
 
-                if (loginVm.showGarden) {
-                    Column {
-                        val model: EmojiVmRealm = viewModel()
-                        MainActivityUi(model.emojiState) { emojiTile ->
-                            emojiSelectorVm.onEmojiClicked(emojiTile)
-                            states.show()
+                    val loginVm: LoginVm = viewModel()
+
+                    if (loginVm.showGarden) {
+                        Column {
+                            val model: EmojiVmRealm = viewModel()
+                            MainActivityUi(model.emojiState, model.myToken) { emojiTile ->
+                                emojiSelectorVm.onEmojiClicked(emojiTile)
+                                bottomSheetScope.launch { states.show() }
+                            }
                         }
+                    } else {
+                        LoginView(loginVm::login)
                     }
-                } else {
-                    LoginView(loginVm::login)
                 }
             }
-        }
+
     }
 }
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 @Composable
-fun EmojiGrid(emojiList: List<EmojiTile>, onEmojiClicked: (EmojiTile) -> Unit) {
+fun EmojiGrid(emojiList: List<EmojiTile>, myToken: String, onEmojiClicked: (EmojiTile) -> Unit) {
 
     LazyVerticalGrid(cells = GridCells.Adaptive(54.dp)) {
         items(emojiList) { emojiTile ->
-            EmojiHolder(emojiTile, onEmojiClicked)
+            EmojiHolder(emojiTile, myToken, onEmojiClicked)
         }
     }
 }
 
 @Composable
-fun EmojiHolder(emoji: EmojiTile, onEmojiClicked: (EmojiTile) -> Unit) {
+fun EmojiHolder(emoji: EmojiTile, myToken: String, onEmojiClicked: (EmojiTile) -> Unit) {
+    Log.d("emojiid","Emoji, ${emoji.owner}, Token: $myToken")
     Button(onClick = { onEmojiClicked(emoji) }
     ) {
-        Text(emoji.emoji)
+        Text(emoji.emoji, modifier = Modifier.background(if (emoji.owner == myToken) Color.Red else Color.White , RectangleShape))
     }
 }
 
 @Preview
 @Composable
 fun EmojiPreview() {
-    EmojiHolder(EmojiTile().apply { emoji = "😼" }) {}
+    EmojiHolder(EmojiTile().apply { emoji = "😼" }, "") {}
 }
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 @Composable
-fun MainActivityUi(emojiList: List<EmojiTile>, onEmojiClicked: (EmojiTile) -> Unit) {
+fun MainActivityUi(emojiList: List<EmojiTile>, myToken : String, onEmojiClicked: (EmojiTile) -> Unit) {
     EmojiGardenTheme {
         Box(
-            Modifier.fillMaxSize().padding(16.dp)
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            EmojiGrid(emojiList, onEmojiClicked)
+            EmojiGrid(emojiList, myToken, onEmojiClicked)
         }
     }
 }
@@ -113,7 +122,9 @@ fun MainActivityUi(emojiList: List<EmojiTile>, onEmojiClicked: (EmojiTile) -> Un
 @Composable
 fun LoginView(login: () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -131,285 +142,24 @@ fun LoginPreview() {
 }
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    val emojis = listOf(
-        "🐤",
-        "🐦",
-        "🐔",
-        "🦤",
-        "🕊",
-        "️",
-        "🦆",
-        "🦅",
-        "🪶",
-        "🦩",
-        "🐥",
-        "-",
-        "🐣",
-        "🦉",
-        "🦜",
-        "🦚",
-        "🐧",
-        "🐓",
-        "🦢",
-        "🦃",
-        "🦡",
-        "🦇",
-        "🐻",
-        "🦫",
-        "🦬",
-        "🐈",
-        "‍",
-        "⬛",
-        "🐗",
-        "🐪",
-        "🐈",
-        "🐱",
-        "🐿",
-        "️",
-        "🐄",
-        "🐮",
-        "🦌",
-        "🐕",
-        "🐶",
-        "🐘",
-        "🐑",
-        "🦊",
-        "🦒",
-        "🐐",
-        "🦍",
-        "🦮",
-        "🐹",
-        "🦔",
-        "🦛",
-        "🐎",
-        "🐴",
-        "🦘",
-        "🐨",
-        "🐆",
-        "🦁",
-        "🦙",
-        "🦣",
-        "🐒",
-        "🐵",
-        "🐁",
-        "🐭",
-        "🦧",
-        "🦦",
-        "🐂",
-        "🐼",
-        "🐾",
-        "🐖",
-        "🐷",
-        "🐽",
-        "🐻",
-        "‍",
-        "❄",
-        "️",
-        "🐩",
-        "🐇",
-        "🐰",
-        "🦝",
-        "🐏",
-        "🐀",
-        "🦏",
-        "🐕",
-        "‍",
-        "🦺",
-        "🦨",
-        "🦥",
-        "🐅",
-        "🐯",
-        "🐫",
-        "-",
-        "🦄",
-        "🐃",
-        "🐺",
-        "🦓",
-        "🐳",
-        "🐡",
-        "🐬",
-        "🐟",
-        "🐙",
-        "🦭",
-        "🦈",
-        "🐚",
-        "🐳",
-        "🐠",
-        "🐋",
-        "🌱",
-        "🌵",
-        "🌳",
-        "🌲",
-        "🍂",
-        "🍀",
-        "🌿",
-        "🍃",
-        "🍁",
-        "🌴",
-        "🪴",
-        "🌱",
-        "☘",
-        "️",
-        "🌾",
-        "🐊",
-        "🐊",
-        "🐉",
-        "🐲",
-        "🦎",
-        "🦕",
-        "🐍",
-        "🦖",
-        "-",
-        "🐢"
-    )
-    MainActivityUi(List(102) { i -> EmojiTile().apply { emoji = emojis[i] } }) {}
+    val emojis = listOf("🐤","🐦","🐔","🦤","🕊","️","🦆","🦅","🪶","🦩","🐥","-","🐣","🦉","🦜","🦚","🐧","🐓","🦢","🦃","🦡","🦇","🐻","🦫","🦬","🐈","‍","⬛","🐗","🐪","🐈","🐱","🐿","️","🐄","🐮","🦌","🐕","🐶","🐘","🐑","🦊","🦒","🐐","🦍","🦮","🐹","🦔","🦛","🐎","🐴","🦘","🐨","🐆","🦁","🦙","🦣","🐒","🐵","🐁","🐭","🦧","🦦","🐂","🐼","🐾","🐖","🐷","🐽","🐻","‍","❄","️","🐩","🐇","🐰","🦝","🐏","🐀","🦏","🐕","‍","🦺","🦨","🦥","🐅","🐯","🐫","-","🦄","🐃","🐺","🦓","🐳","🐡","🐬","🐟","🐙","🦭","🦈","🐚","🐳","🐠","🐋","🌱","🌵","🌳","🌲","🍂","🍀","🌿","🍃","🍁","🌴","🪴","🌱","☘","️","🌾","🐊","🐊","🐉","🐲","🦎","🦕","🐍","🦖","-","🐢")
+    MainActivityUi(List(102) { i -> EmojiTile().apply { emoji = emojis[i] } },"") {}
 }
 
-@ExperimentalLayout
+@ExperimentalFoundationApi
 @Composable
 fun EmojiSelector(onSelected: (String) -> Unit) {
-    // They need to be sorted into Animal, Plant, Person types (all yellow).
-    val selectableEmojis = listOf(
-        "🐤",
-        "🐦",
-        "🐔",
-        "🦤",
-        "🕊",
-        "️",
-        "🦆",
-        "🦅",
-        "🪶",
-        "🦩",
-        "🐥",
-        "-",
-        "🐣",
-        "🦉",
-        "🦜",
-        "🦚",
-        "🐧",
-        "🐓",
-        "🦢",
-        "🦃",
-        "🦡",
-        "🦇",
-        "🐻",
-        "🦫",
-        "🦬",
-        "🐈",
-        "‍",
-        "⬛",
-        "🐗",
-        "🐪",
-        "🐈",
-        "🐱",
-        "🐿",
-        "️",
-        "🐄",
-        "🐮",
-        "🦌",
-        "🐕",
-        "🐶",
-        "🐘",
-        "🐑",
-        "🦊",
-        "🦒",
-        "🐐",
-        "🦍",
-        "🦮",
-        "🐹",
-        "🦔",
-        "🦛",
-        "🐎",
-        "🐴",
-        "🦘",
-        "🐨",
-        "🐆",
-        "🦁",
-        "🦙",
-        "🦣",
-        "🐒",
-        "🐵",
-        "🐁",
-        "🐭",
-        "🦧",
-        "🦦",
-        "🐂",
-        "🐼",
-        "🐾",
-        "🐖",
-        "🐷",
-        "🐽",
-        "🐻",
-        "‍",
-        "❄",
-        "️",
-        "🐩",
-        "🐇",
-        "🐰",
-        "🦝",
-        "🐏",
-        "🐀",
-        "🦏",
-        "🐕",
-        "‍",
-        "🦺",
-        "🦨",
-        "🦥",
-        "🐅",
-        "🐯",
-        "🐫",
-        "-",
-        "🦄",
-        "🐃",
-        "🐺",
-        "🦓",
-        "🐳",
-        "🐡",
-        "🐬",
-        "🐟",
-        "🐙",
-        "🦭",
-        "🦈",
-        "🐚",
-        "🐳",
-        "🐠",
-        "🐋",
-        "🌱",
-        "🌵",
-        "🌳",
-        "🌲",
-        "🍂",
-        "🍀",
-        "🌿",
-        "🍃",
-        "🍁",
-        "🌴",
-        "🪴",
-        "🌱",
-        "☘",
-        "️",
-        "🌾",
-        "🐊",
-        "🐊",
-        "🐉",
-        "🐲",
-        "🦎",
-        "🦕",
-        "🐍",
-        "🦖",
-        "-",
-        "🐢"
-    )
-    // [animal], [plant], [person]
-    // Four items only at first. Same general structure.
+    val selectableEmojis = listOf("🐤","🐦","🐔","🦤","🕊","️","🦆","🦅","🪶","🦩","🐥","-","🐣","🦉","🦜","🦚","🐧","🐓","🦢","🦃","🦡","🦇","🐻","🦫","🦬","🐈","‍","⬛","🐗","🐪","🐈","🐱","🐿","️","🐄","🐮","🦌","🐕","🐶","🐘","🐑","🦊","🦒","🐐","🦍","🦮","🐹","🦔","🦛","🐎","🐴","🦘","🐨","🐆","🦁","🦙","🦣","🐒","🐵","🐁","🐭","🦧","🦦","🐂","🐼","🐾","🐖","🐷","🐽","🐻","‍","❄","️","🐩","🐇","🐰","🦝","🐏","🐀","🦏","🐕","‍","🦺","🦨","🦥","🐅","🐯","🐫","-","🦄","🐃","🐺","🦓","🐳","🐡","🐬","🐟","🐙","🦭","🦈","🐚","🐳","🐠","🐋","🌱","🌵","🌳","🌲","🍂","🍀","🌿","🍃","🍁","🌴","🪴","🌱","☘","️","🌾","🐊","🐊","🐉","🐲","🦎","🦕","🐍","🦖","-","🐢")
     Box(modifier = Modifier.fillMaxWidth()) {
-        FlowRow() {
-            selectableEmojis.forEach {
-                Text(text = it, Modifier.padding(2.dp).clickable(onClick = { onSelected(it) }))
+        LazyVerticalGrid(cells = GridCells.Adaptive(24.dp)) {
+            items(selectableEmojis) {
+                Text(text = it,
+                    Modifier
+                        .padding(2.dp)
+                        .clickable(onClick = { onSelected(it) }))
 
             }
         }
@@ -417,8 +167,8 @@ fun EmojiSelector(onSelected: (String) -> Unit) {
 
 }
 
-@ExperimentalLayout
 @Preview
+@ExperimentalFoundationApi
 @Composable
 fun EmojiSelectorPreview() {
     EmojiSelector {}
@@ -427,59 +177,50 @@ fun EmojiSelectorPreview() {
 @Composable
 fun TextFieldDemo(emojiTile: EmojiTile, onBioUpdated: (String, String) -> Unit) {
 
+
         Column(Modifier.padding(16.dp)) {
             var descriptionTextState by remember { mutableStateOf(TextFieldValue(emojiTile.name)) }
             var nameTextState by remember { mutableStateOf(TextFieldValue(emojiTile.bio)) }
 
-            onDispose(callback = {
-                onBioUpdated(nameTextState.text,descriptionTextState.text)
-            })
+            Button(onClick = {onBioUpdated(nameTextState.text,descriptionTextState.text)}){
+                Text("Save")
+            }
 
             OutlinedTextField(
                 label = { Text("Your Name:") },
                 value = nameTextState,
                 onValueChange = { nameTextState = it })
-            Spacer(Modifier.preferredHeight(4.dp))
+            Spacer(Modifier.height(4.dp))
             OutlinedTextField(
                 label = { Text("Describe Yourself:") },
                 value = descriptionTextState,
                 onValueChange = { descriptionTextState = it })
-        }
-
-
+    }
 }
 
-@ExperimentalLayout
+@ExperimentalFoundationApi
 @Composable
 fun OptionalOptions(
     onEmojiSelected: (String) -> Unit,
     currentEmojiTile: EmojiTile?,
     onBioUpdated: (String, String) -> Unit
 ) {
-    var tabSelected : EmojiSelectOptions by remember { mutableStateOf(EmojiSelectOptions.EDIT_EMOJI) }
+
+    DisposableEffect(true){
+        onDispose {
+            Log.d("dispose effect", "It was disposed")
+        }
+    }
     Column {
         // TODO
         //  highlight the current emoji when it's being edited.
         //  highlight the current emoji in the normal view when it's your emoji.
         //  fix the problem with the textviews crashing when they're attempted to be loaded.
 
-
-        // Only the tab headings
-        TabRow(selectedTabIndex = tabSelected.ordinal ) {
-            EmojiSelectOptions.values().forEach { selectOption ->
-                Tab(
-                    selected = selectOption == tabSelected,
-                    onClick = { tabSelected = selectOption },
-                    text = { Text(selectOption.tabName) })
-            }
+        EmojiSelector(onEmojiSelected)
+        if(currentEmojiTile != null ) {
+            TextFieldDemo(currentEmojiTile, onBioUpdated)
         }
-
-        // Actual tab content
-        when (tabSelected) {
-            EmojiSelectOptions.EDIT_EMOJI -> EmojiSelector(onEmojiSelected)
-            EmojiSelectOptions.EDIT_DESCRIPTION -> TextFieldDemo(currentEmojiTile!!, onBioUpdated)
-        }
-
 
     }
     // if it's yours then you see all this.
@@ -494,7 +235,7 @@ fun OptionalOptions(
 fun OtherPersonsTileDetail(emojiTile: EmojiTile) {
     Row {
         Text(emojiTile.emoji)
-        Spacer(Modifier.preferredWidth(4.dp))
+        Spacer(Modifier.width(4.dp))
         Column {
            Text("Name")
            Text("Description")
@@ -507,18 +248,6 @@ fun OtherPersonsTileDetail(emojiTile: EmojiTile) {
 fun SeeOtherPersonsComposable() {
     OtherPersonsTileDetail(emojiTile = EmojiTile().apply { emoji = "🐴"  })
 }
-
-enum class EmojiSelectOptions(val tabName : String) {
-    EDIT_EMOJI("Select Emoji"),
-    EDIT_DESCRIPTION("Edit Description"),
-    VIEW_OTHER_PERSONS_DESCRIPTION("Buddy")
-}
-
-sealed class OptionTabs {
-    object Emoji : OptionTabs()
-    object Description : OptionTabs()
-}
-
 
 @Preview(showBackground = true)
 @Composable

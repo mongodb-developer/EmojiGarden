@@ -174,19 +174,19 @@ fun EmojiSelector(emojiTile: MutableState<EmojiTile?>) {
 @Composable
 fun TextFieldDemo(emojiTile: MutableState<EmojiTile?>) {
 
-        Column(Modifier.padding(16.dp)) {
+    Column(Modifier.padding(16.dp)) {
 
-            OutlinedTextField(
-                label = { Text("Your Name:") },
-                value = emojiTile.value!!.name,
-                onValueChange = { change ->  emojiTile.value = emojiTile.value?.apply { name = change } }
-            )
-            Spacer(Modifier.height(4.dp))
-            OutlinedTextField(
-                label = { Text("Describe Yourself:") },
-                value = emojiTile.value!!.bio,
-                onValueChange = { change ->  emojiTile.value = emojiTile.value?.apply { bio = change } }
-            )
+        OutlinedTextField(
+            label = { Text("Your Name:") },
+            value = emojiTile.value!!.name,
+            onValueChange = { change ->  emojiTile.value = emojiTile.value?.apply { name = change } }
+        )
+        Spacer(Modifier.height(4.dp))
+        OutlinedTextField(
+            label = { Text("Describe Yourself:") },
+            value = emojiTile.value!!.bio,
+            onValueChange = { change ->  emojiTile.value = emojiTile.value?.apply { bio = change } }
+        )
     }
 }
 

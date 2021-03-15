@@ -49,13 +49,10 @@ class MainActivity : AppCompatActivity() {
 
                 ModalBottomSheetLayout(
                     sheetContent = {
-                        OptionalOptions({ newEmoji ->
-                            emojiSelectorVm.onNewEmojiSelected(newEmoji)
+                        OptionalOptions(emojiSelectorVm.currentEmoji) {
+                            emojiSelectorVm.save()
                             bottomSheetScope.launch { states.hide() }
-                        }, emojiSelectorVm.currentEmoji,
-                            {a,b -> emojiSelectorVm.onBioUpdated(a,b)
-                                bottomSheetScope.launch { states.hide() } }
-                        )
+                        }
                     },
                     sheetState = states
                 ) {
@@ -151,7 +148,7 @@ fun DefaultPreview() {
 
 @ExperimentalFoundationApi
 @Composable
-fun EmojiSelector(onSelected: (String) -> Unit) {
+fun EmojiSelector(emojiTile: MutableState<EmojiTile?>) {
     val selectableEmojis = listOf("🐤","🐦","🐔","🦤","🕊","️","🦆","🦅","🪶","🦩","🐥","-","🐣","🦉","🦜","🦚","🐧","🐓","🦢","🦃","🦡","🦇","🐻","🦫","🦬","🐈","‍","⬛","🐗","🐪","🐈","🐱","🐿","️","🐄","🐮","🦌","🐕","🐶","🐘","🐑","🦊","🦒","🐐","🦍","🦮","🐹","🦔","🦛","🐎","🐴","🦘","🐨","🐆","🦁","🦙","🦣","🐒","🐵","🐁","🐭","🦧","🦦","🐂","🐼","🐾","🐖","🐷","🐽","🐻","‍","❄","️","🐩","🐇","🐰","🦝","🐏","🐀","🦏","🐕","‍","🦺","🦨","🦥","🐅","🐯","🐫","-","🦄","🐃","🐺","🦓","🐳","🐡","🐬","🐟","🐙","🦭","🦈","🐚","🐳","🐠","🐋","🌱","🌵","🌳","🌲","🍂","🍀","🌿","🍃","🍁","🌴","🪴","🌱","☘","️","🌾","🐊","🐊","🐉","🐲","🦎","🦕","🐍","🦖","-","🐢")
     Box(modifier = Modifier.fillMaxWidth()) {
         LazyVerticalGrid(cells = GridCells.Adaptive(24.dp)) {
@@ -159,7 +156,7 @@ fun EmojiSelector(onSelected: (String) -> Unit) {
                 Text(text = it,
                     Modifier
                         .padding(2.dp)
-                        .clickable(onClick = { onSelected(it) }))
+                        .clickable(onClick = { emojiTile.value?.emoji = it }))
 
             }
         }
@@ -167,43 +164,37 @@ fun EmojiSelector(onSelected: (String) -> Unit) {
 
 }
 
-@Preview
-@ExperimentalFoundationApi
-@Composable
-fun EmojiSelectorPreview() {
-    EmojiSelector {}
-}
+//@Preview
+//@ExperimentalFoundationApi
+//@Composable
+//fun EmojiSelectorPreview() {
+//    EmojiSelector(EmojiTile())
+//}
 
 @Composable
-fun TextFieldDemo(emojiTile: EmojiTile, onBioUpdated: (String, String) -> Unit) {
-
+fun TextFieldDemo(emojiTile: MutableState<EmojiTile?>) {
 
         Column(Modifier.padding(16.dp)) {
-            var descriptionTextState by remember { mutableStateOf(TextFieldValue(emojiTile.name)) }
-            var nameTextState by remember { mutableStateOf(TextFieldValue(emojiTile.bio)) }
-
-            Button(onClick = {onBioUpdated(nameTextState.text,descriptionTextState.text)}){
-                Text("Save")
-            }
 
             OutlinedTextField(
                 label = { Text("Your Name:") },
-                value = nameTextState,
-                onValueChange = { nameTextState = it })
+                value = emojiTile.value!!.name,
+                onValueChange = { change ->  emojiTile.value = emojiTile.value?.apply { name = change } }
+            )
             Spacer(Modifier.height(4.dp))
             OutlinedTextField(
                 label = { Text("Describe Yourself:") },
-                value = descriptionTextState,
-                onValueChange = { descriptionTextState = it })
+                value = emojiTile.value!!.bio,
+                onValueChange = { change ->  emojiTile.value = emojiTile.value?.apply { bio = change } }
+            )
     }
 }
 
 @ExperimentalFoundationApi
 @Composable
 fun OptionalOptions(
-    onEmojiSelected: (String) -> Unit,
-    currentEmojiTile: EmojiTile?,
-    onBioUpdated: (String, String) -> Unit
+    currentEmojiTile: MutableState<EmojiTile?>,
+    save : () -> Unit
 ) {
 
     DisposableEffect(true){
@@ -217,9 +208,13 @@ fun OptionalOptions(
         //  highlight the current emoji in the normal view when it's your emoji.
         //  fix the problem with the textviews crashing when they're attempted to be loaded.
 
-        EmojiSelector(onEmojiSelected)
-        if(currentEmojiTile != null ) {
-            TextFieldDemo(currentEmojiTile, onBioUpdated)
+        Button(save){
+            Text("Save")
+        }
+
+        if( currentEmojiTile.value != null ) {
+            EmojiSelector(currentEmojiTile)
+            TextFieldDemo(currentEmojiTile)
         }
 
     }
@@ -252,5 +247,5 @@ fun SeeOtherPersonsComposable() {
 @Preview(showBackground = true)
 @Composable
 fun TextFieldPreview() {
-    TextFieldDemo(EmojiTile()) { _,_ -> }
+    TextFieldDemo(mutableStateOf(null))
 }

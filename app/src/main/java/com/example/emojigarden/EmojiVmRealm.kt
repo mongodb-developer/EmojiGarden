@@ -9,7 +9,6 @@ import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.setValue
 import io.realm.kotlin.syncSession
 
-
 class EmojiVmRealm(application: Application) : AndroidViewModel(application) {
 
     /** emojiState which can be used in compose directly.
@@ -21,6 +20,10 @@ class EmojiVmRealm(application: Application) : AndroidViewModel(application) {
     var emojiState : List<EmojiTile> by mutableStateOf(listOf(), neverEqualPolicy())
         private set
 
+    fun isOwnTile(emojiTile: EmojiTile) : Boolean {
+        return emojiTile.owner == myToken
+    }
+
     /** Changes are set to the current list, the changeset isn't required so it's marked _
      */
     private val emojiTilesChangeListener  =
@@ -28,7 +31,7 @@ class EmojiVmRealm(application: Application) : AndroidViewModel(application) {
         emojiState = updatedResults.freeze()
     }
 
-    val myToken : String by mutableStateOf<String>(getApplication<EmojiGardenApplication>().realmModule.getSyncedRealm().syncSession.user.id)
+    private val myToken : String by lazy { getApplication<EmojiGardenApplication>().realmModule.getSyncedRealm().syncSession.user.id }
 
     private val emojiTilesResults : RealmResults<EmojiTile> =  getApplication<EmojiGardenApplication>().realmModule
          .getSyncedRealm()

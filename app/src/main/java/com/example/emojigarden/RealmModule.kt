@@ -2,14 +2,11 @@ package com.example.emojigarden
 
 import android.app.Application
 import android.util.Log
-
 import io.realm.Realm
 import io.realm.mongodb.App
 import io.realm.mongodb.AppConfiguration
 import io.realm.mongodb.Credentials
-import io.realm.mongodb.User
 import io.realm.mongodb.sync.SyncConfiguration
-import java.lang.IllegalStateException
 
 /**
  * Manages the setup for a synced realm db.
@@ -23,10 +20,10 @@ import java.lang.IllegalStateException
  *
  * All That's needed
  */
-class RealmModule(application: Application, appId : String) {
+class RealmModule(application: Application, appId: String) {
     private var syncedRealm: Realm? = null
-    private var insertRealm : Realm? = null
-    private val app : App
+    private var insertRealm: Realm? = null
+    private val app: App
     private val TAG = RealmModule::class.java.simpleName
 
     init {
@@ -37,36 +34,35 @@ class RealmModule(application: Application, appId : String) {
 
         // Login anonymously because a logged in user is required to open a synced realm.
         loginAnonSyncedRealm(
-            onSuccess = {Log.d(TAG, "Login successful") },
-            onFailure = {Log.d(TAG, "Login Unsuccessful, are you connected to the net?")}
+            onSuccess = { Log.d(TAG, "Login successful") },
+            onFailure = { Log.d(TAG, "Login Unsuccessful, are you connected to the net?") }
         )
     }
 
-    fun loginAnonSyncedRealm(partitionKey : String = "default", onSuccess : () -> Unit, onFailure : () -> Unit ) {
+    fun loginAnonSyncedRealm(
+        partitionKey: String = "default",
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
 
         val credentials = Credentials.anonymous()
 
         app.loginAsync(credentials) { loginResult ->
             Log.d("RealmModule", "logged in: $loginResult, error? : ${loginResult.error}")
             if (loginResult.isSuccess) {
-                instantiateSyncedRealm(loginResult.get(), partitionKey)
-                instantiateInsertRealm(loginResult.get(), loginResult.get().id)
+                val publicRealmConfig =
+                    SyncConfiguration.defaultConfig(loginResult.get(), partitionKey)
+                syncedRealm = Realm.getInstance(publicRealmConfig)
+
+                val userRealmConfig =
+                    SyncConfiguration.defaultConfig(loginResult.get(), loginResult.get().id)
+                insertRealm = Realm.getInstance(userRealmConfig)
                 onSuccess()
             } else {
                 onFailure()
             }
         }
 
-    }
-
-    private fun instantiateInsertRealm(user: User?, partition : String) {
-        val config: SyncConfiguration = SyncConfiguration.defaultConfig(user, partition)
-        insertRealm = Realm.getInstance(config)
-    }
-
-    private fun instantiateSyncedRealm(user: User?, partition : String) {
-        val config: SyncConfiguration = SyncConfiguration.defaultConfig(user, partition)
-        syncedRealm = Realm.getInstance(config)
     }
 
     /**
@@ -88,7 +84,9 @@ class RealmModule(application: Application, appId : String) {
      */
     fun isInitialized() = syncedRealm != null
 
-    fun getSyncedRealm() : Realm = syncedRealm ?: throw IllegalStateException("loginAnonSyncedRealm has to return onSuccess first")
+    fun getSyncedRealm(): Realm = syncedRealm
+        ?: throw IllegalStateException("loginAnonSyncedRealm has to return onSuccess first")
 
-    fun getInsertRealm() : Realm = insertRealm ?: throw IllegalStateException("loginAnonSyncedRealm has to return onSuccess first")
+    fun getInsertRealm(): Realm = insertRealm
+        ?: throw IllegalStateException("loginAnonSyncedRealm has to return onSuccess first")
 }

@@ -1,35 +1,34 @@
 package com.example.emojigarden
 
+
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
 import com.example.emojigarden.ui.EmojiGardenTheme
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.lifecycle.viewmodel.compose.viewModel
+
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val loginVm : LoginVm = viewModel()
+            val loginVm: LoginVm = viewModel()
 
-            if(loginVm.showGarden){
-                val model : EmojiVmRealm = viewModel()
+            if (loginVm.showGarden) {
+                val model: EmojiVmRealm = viewModel()
                 MainActivityUi(model.emojiState)
-            } else
-            {
+            } else {
                 LoginView(loginVm::login)
             }
 
@@ -38,7 +37,6 @@ class MainActivity : AppCompatActivity() {
 }
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 @Composable
 fun EmojiGrid(emojiList: List<EmojiTile>) {
 
@@ -61,12 +59,13 @@ fun EmojiPreview() {
 }
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 @Composable
 fun MainActivityUi(emojiList: List<EmojiTile>) {
     EmojiGardenTheme {
         Box(
-            Modifier.fillMaxSize().padding(16.dp)
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
             EmojiGrid(emojiList)
         }
@@ -74,12 +73,17 @@ fun MainActivityUi(emojiList: List<EmojiTile>) {
 }
 
 @Composable
-fun LoginView(login : () -> Unit) {
-    Column(modifier = Modifier.fillMaxWidth().padding(16.dp),
+fun LoginView(login: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally){
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-        Button(login){
+        Button(login) {
             Text("Login")
         }
     }
@@ -88,14 +92,143 @@ fun LoginView(login : () -> Unit) {
 @Composable
 @Preview(showBackground = true)
 fun LoginPreview() {
-    LoginView{}
+    LoginView {}
 }
 
 @ExperimentalFoundationApi
-@ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    val emojis = listOf("🐤","🐦","🐔","🦤","🕊","️","🦆","🦅","🪶","🦩","🐥","-","🐣","🦉","🦜","🦚","🐧","🐓","🦢","🦃","🦡","🦇","🐻","🦫","🦬","🐈","‍","⬛","🐗","🐪","🐈","🐱","🐿","️","🐄","🐮","🦌","🐕","🐶","🐘","🐑","🦊","🦒","🐐","🦍","🦮","🐹","🦔","🦛","🐎","🐴","🦘","🐨","🐆","🦁","🦙","🦣","🐒","🐵","🐁","🐭","🦧","🦦","🐂","🐼","🐾","🐖","🐷","🐽","🐻","‍","❄","️","🐩","🐇","🐰","🦝","🐏","🐀","🦏","🐕","‍","🦺","🦨","🦥","🐅","🐯","🐫","-","🦄","🐃","🐺","🦓","🐳","🐡","🐬","🐟","🐙","🦭","🦈","🐚","🐳","🐠","🐋","🌱","🌵","🌳","🌲","🍂","🍀","🌿","🍃","🍁","🌴","🪴","🌱","☘","️","🌾","🐊","🐊","🐉","🐲","🦎","🦕","🐍","🦖","-","🐢")
-    MainActivityUi(List(102){ i -> EmojiTile().apply  { emoji = emojis[i] }})
+    val emojis = listOf(
+        "🐤",
+        "🐦",
+        "🐔",
+        "🦤",
+        "🕊",
+        "️",
+        "🦆",
+        "🦅",
+        "🪶",
+        "🦩",
+        "🐥",
+        "-",
+        "🐣",
+        "🦉",
+        "🦜",
+        "🦚",
+        "🐧",
+        "🐓",
+        "🦢",
+        "🦃",
+        "🦡",
+        "🦇",
+        "🐻",
+        "🦫",
+        "🦬",
+        "🐈",
+        "‍",
+        "⬛",
+        "🐗",
+        "🐪",
+        "🐈",
+        "🐱",
+        "🐿",
+        "️",
+        "🐄",
+        "🐮",
+        "🦌",
+        "🐕",
+        "🐶",
+        "🐘",
+        "🐑",
+        "🦊",
+        "🦒",
+        "🐐",
+        "🦍",
+        "🦮",
+        "🐹",
+        "🦔",
+        "🦛",
+        "🐎",
+        "🐴",
+        "🦘",
+        "🐨",
+        "🐆",
+        "🦁",
+        "🦙",
+        "🦣",
+        "🐒",
+        "🐵",
+        "🐁",
+        "🐭",
+        "🦧",
+        "🦦",
+        "🐂",
+        "🐼",
+        "🐾",
+        "🐖",
+        "🐷",
+        "🐽",
+        "🐻",
+        "‍",
+        "❄",
+        "️",
+        "🐩",
+        "🐇",
+        "🐰",
+        "🦝",
+        "🐏",
+        "🐀",
+        "🦏",
+        "🐕",
+        "‍",
+        "🦺",
+        "🦨",
+        "🦥",
+        "🐅",
+        "🐯",
+        "🐫",
+        "-",
+        "🦄",
+        "🐃",
+        "🐺",
+        "🦓",
+        "🐳",
+        "🐡",
+        "🐬",
+        "🐟",
+        "🐙",
+        "🦭",
+        "🦈",
+        "🐚",
+        "🐳",
+        "🐠",
+        "🐋",
+        "🌱",
+        "🌵",
+        "🌳",
+        "🌲",
+        "🍂",
+        "🍀",
+        "🌿",
+        "🍃",
+        "🍁",
+        "🌴",
+        "🪴",
+        "🌱",
+        "☘",
+        "️",
+        "🌾",
+        "🐊",
+        "🐊",
+        "🐉",
+        "🐲",
+        "🦎",
+        "🦕",
+        "🐍",
+        "🦖",
+        "-",
+        "🐢"
+    )
+    MainActivityUi(List(102) { i -> EmojiTile().apply { emoji = emojis[i] } })
 }

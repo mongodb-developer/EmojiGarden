@@ -1,0 +1,31 @@
+mongoimport --collection "m103.products" --drop --file /dataset/products.json --uri mongodb://m103-admin:m103-pass@localhost:26000/admin
+
+
+mongoimport --host localhost --port 26000 --db m103 --collection products --file /dataset/products.json --username m103-admin --password m103-pass --authenticationDatabase admin
+
+sh.shardCollection("m103.products", { sku: 1 } )
+
+
+---------------------------------------------------------------
+See the schema appear in atlas when its set.
+
+Remember when the schema was created by setting one object.
+	Expand it out in the backend when we're adding more in the backend
+---------------------------------------------------------------
+Flow as app -> database and database -> app
+---------------------------------------------------------------
+Particular app name and db naming stuff
+
+If I'm reading it for the first time does it make sense?
+
+------------------------------------------------------
+See if the flow is reasonable
+------------------------------------------------------
+Add tree behind the scenes
+------------------------------------------------------
+We've only one emoji, here's the backend and let's add more
+Planting a seed, see how later how that works
+------------------------------------------------------
+Step back from this and see how it works
+------------------------------------------------------
+Offline/Online stuff with people
